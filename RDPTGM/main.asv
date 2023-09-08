@@ -1,0 +1,52 @@
+clear;clc;close all
+warning off;
+global X0 time_interval time_data error_style n nf;
+nf=1; %预测外推值的个数
+%% 导入数据
+[X,time_data]=Input_data();
+time_interval=time_data(2:end,1)-time_data(1:end-1,1);
+time_interval=time_interval./mean(time_interval);
+time_data=cumsum([1;time_interval]);
+% X0=xlsread('data.xlsx'); %import data from excel 
+n=numel(X)-nf;
+X0=X(1:n,1);
+%% 计算结果
+Result=[];
+SearchAgents_no=50;Max_iteration=300;
+
+% Model 1 dy/dt=sum(ai*t^i)y+sum(bi*t^i)+c recursive estimation
+fobj=@RDPTGM;
+lb=[0,0];ub=[1,n-4];dim=2;
+[~,param,Convergence_curve,Bestpos_curve]=WOA(SearchAgents_no,Max_iteration,lb,ub,dim,fobj);
+[~,X0F]=fobj(param);
+error_style='MAPE';         %selected from 'MAPE','MAE','RMSE','R2'
+mape=[calculate_error(X(1:n,1),X0F(1:n,1)),calculate_error(X(n+1:end,1),X0F(n+1:end,1))];
+Result=[Result,[mape';[param'];X0F]];
+
+% Model 2 dy/dt=ay+sum(bi*t^i)+c  PTGM Application of a novel grey forecasting model with time power term to predict China’s GDP
+fobj=@PTGM;
+lb=[0];
+ub=[n-4];
+dim=1;
+[~,param,Convergence_curve,Bestpos_curve]=WOA(SearchAgents_no,Max_iteration,lb,ub,dim,fobj);
+[~,X0F]=fobj(param);
+error_style='MAPE';         %可选填 'MAPE','MAE','RMSE','R2'
+mape=[calculate_error(X(1:n,1),X0F(1:n,1)),calculate_error(X(n+1:end,1),X0F(n+1:end,1))];
+Result=[Result,[mape';[0,param]';X0F]];
+
+% Model 3 dy/dt=ay+sum(bi*t^i)+c  PTGM Application of a novel grey forecasting model with time power term to predict China’s GDP
+fobj=@DPTGM;
+lb=[0];
+ub=[n-4];
+dim=1;
+[~,param,Convergence_curve,Bestpos_curve]=WOA(SearchAgents_no,Max_iteration,lb,ub,dim,fobj);
+[~,X0F]=fobj(param);
+error_style='MAPE';         %可选填 'MAPE','MAE','RMSE','R2'
+mape=[calculate_error(X(1:n,1),X0F(1:n,1)),calculate_error(X(n+1:end,1),X0F(n+1:end,1))];
+Result=[Result,[mape';[0,param]';X0F]];
+
+
+% Model 4 dy/dt=ay+b
+[ X0F] = NGM(  );
+mape=[calculate_error(X(1:n,1),X0F(1:n,1)),calculate_error(X(n+1:end,1),X0F(n+1:end,1))];
+Result=[Result,[mape';[1,0]';X0F]];
