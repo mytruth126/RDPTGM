@@ -11,7 +11,6 @@ open Result2
 
 # Step
 1. Input data in the 'data.xlsx' file
-Alternatively, you can input data in the 'Input.m' file
 2. Set parameters of mian. m
 nf: number of validation sets
 3. Run main.m
