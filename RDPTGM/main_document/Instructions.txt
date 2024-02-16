@@ -1,0 +1,12 @@
+%%
+main_RDPTGM. m ————————————main program
+PTGM. m ————————————PTGM model
+DPTGM. m —————————————DPTGM model
+RDPTGM.m ————————RDPTGM model
+example data.xlsx ————————————input data file
+
+
+
+
+
+
