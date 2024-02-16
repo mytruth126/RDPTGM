@@ -14,7 +14,7 @@ nf: number of validation sets
 
 data=xlsread('example data.xlsx','application') % read data
 
-3. Run main_document.m
+3. Run main_RDPTGM.m
 
 4. Save the results in X0F
 
